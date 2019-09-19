@@ -16,7 +16,7 @@ before_script:
 
 Package:
   stage: Package 🐳
-  image: docker:18
+  image: docker:18-git
   services:
     - docker:18-dind
   script:
