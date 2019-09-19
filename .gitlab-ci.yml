@@ -20,7 +20,7 @@ Package:
   services:
     - docker:18-dind
   script:
-    - export TAG=${PLUGINS/,/-}-$version
+    - export TAG=${PLUGINS//,/-}-$version
     - docker build -t $CI_REGISTRY_IMAGE:$TAG --build-arg version=$VERSION --build-arg plugins=$PLUGINS github.com/abiosoft/caddy-docker.git
     - docker push $CI_REGISTRY_IMAGE:$TAG
   only:
@@ -32,7 +32,7 @@ Push to dockerhub:
   services:
     - docker:18-dind
   script:
-    - export TAG=${PLUGINS/,/-}-$version
+    - export TAG=${PLUGINS//,/-}-$version
     - docker pull $CI_REGISTRY_IMAGE:$TAG
     - docker tag $CI_REGISTRY_IMAGE:$TAG florianperrot/caddy:$TAG
     - docker push florianperrot/caddy:$TAG
