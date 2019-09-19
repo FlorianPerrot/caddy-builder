@@ -1,0 +1,40 @@
+variables:
+  DOCKER_HOST: tcp://docker:2375/
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: "/certs"
+
+  VERSION: 1.0.3
+  PLUGINS: cache,consul,ratelimit,realip,prometheus
+
+stages:
+  - Package 🐳
+  - Dockerhub 🚀
+
+before_script:
+  - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  - docker login -u $DOCKERHUB_REGISTRY_USER -p $DOCKERHUB_REGISTRY_PASSWORD
+
+Package:
+  stage: Package 🐳
+  image: docker:18
+  services:
+    - docker:18-dind
+  script:
+    - export TAG=${PLUGINS/,/-}-$version
+    - docker build -t $CI_REGISTRY_IMAGE:$TAG --build-arg version=$VERSION --build-arg plugins=$PLUGINS github.com/abiosoft/caddy-docker.git
+    - docker push $CI_REGISTRY_IMAGE:$TAG
+  only:
+    - master
+
+Push to dockerhub:
+  stage: Dockerhub 🚀
+  image: docker:18
+  services:
+    - docker:18-dind
+  script:
+    - export TAG=${PLUGINS/,/-}-$version
+    - docker pull $CI_REGISTRY_IMAGE:$TAG
+    - docker tag $CI_REGISTRY_IMAGE:$TAG florianperrot/caddy:$TAG
+    - docker push florianperrot/caddy:$TAG
+  only:
+    - master
