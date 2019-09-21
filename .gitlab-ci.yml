@@ -3,10 +3,8 @@ variables:
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: ""
 
-  VERSION: 1.0.3
-  PLUGINS: cache,consul,ratelimit,realip,prometheus
-
 stages:
+  - Test 🛠
   - Package 🐳
   - Dockerhub 🚀
 
@@ -14,15 +12,20 @@ before_script:
   - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   - docker login -u $DOCKERHUB_REGISTRY_USER -p $DOCKERHUB_REGISTRY_PASSWORD
 
+Test:
+  stage: Test 🛠
+  image: golang:1.13
+  script:
+    - go test
+
 Package:
   stage: Package 🐳
   image: docker:18-git
   services:
     - docker:18-dind
   script:
-    - export TAG=${PLUGINS//,/-}-$version
-    - docker build -t $CI_REGISTRY_IMAGE:$TAG --build-arg version=$VERSION --build-arg plugins=$PLUGINS github.com/abiosoft/caddy-docker.git
-    - docker push $CI_REGISTRY_IMAGE:$TAG
+    - docker build -t $CI_REGISTRY_IMAGE:latest .
+    - docker push $CI_REGISTRY_IMAGE:latest
   only:
     - master
 
@@ -32,9 +35,8 @@ Push to dockerhub:
   services:
     - docker:18-dind
   script:
-    - export TAG=${PLUGINS//,/-}-$version
-    - docker pull $CI_REGISTRY_IMAGE:$TAG
-    - docker tag $CI_REGISTRY_IMAGE:$TAG florianperrot/caddy:$TAG
-    - docker push florianperrot/caddy:$TAG
+    - docker pull $CI_REGISTRY_IMAGE:latest
+    - docker tag $CI_REGISTRY_IMAGE:latest florianperrot/caddy:latest
+    - docker push florianperrot/caddy-builder:latest
   only:
     - master
