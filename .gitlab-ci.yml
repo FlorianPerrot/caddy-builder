@@ -8,10 +8,6 @@ stages:
   - Package 🐳
   - Dockerhub 🚀
 
-before_script:
-  - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-  - docker login -u $DOCKERHUB_REGISTRY_USER -p $DOCKERHUB_REGISTRY_PASSWORD
-
 Test:
   stage: Test 🛠
   image: golang:1.13
@@ -23,6 +19,9 @@ Package:
   image: docker:18-git
   services:
     - docker:18-dind
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker login -u $DOCKERHUB_REGISTRY_USER -p $DOCKERHUB_REGISTRY_PASSWORD
   script:
     - docker build -t $CI_REGISTRY_IMAGE:latest .
     - docker push $CI_REGISTRY_IMAGE:latest
@@ -34,6 +33,9 @@ Push to dockerhub:
   image: docker:18
   services:
     - docker:18-dind
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker login -u $DOCKERHUB_REGISTRY_USER -p $DOCKERHUB_REGISTRY_PASSWORD
   script:
     - docker pull $CI_REGISTRY_IMAGE:latest
     - docker tag $CI_REGISTRY_IMAGE:latest florianperrot/caddy:latest
