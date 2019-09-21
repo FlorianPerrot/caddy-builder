@@ -38,7 +38,7 @@ Push to dockerhub:
     - docker login -u $DOCKERHUB_REGISTRY_USER -p $DOCKERHUB_REGISTRY_PASSWORD
   script:
     - docker pull $CI_REGISTRY_IMAGE:latest
-    - docker tag $CI_REGISTRY_IMAGE:latest florianperrot/caddy:latest
+    - docker tag $CI_REGISTRY_IMAGE:latest florianperrot/caddy-builder:latest
     - docker push florianperrot/caddy-builder:latest
   only:
     - master
