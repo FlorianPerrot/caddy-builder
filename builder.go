@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -20,9 +21,10 @@ var (
 )
 
 var (
-	caddyLib = GoLib{"github.com/caddyserver/caddy", envVersion}
+	output      = flag.String("o", "./caddy", "Output caddy file")
+	caddyLib    = GoLib{"github.com/caddyserver/caddy", envVersion}
 	buildDir, _ = ioutil.TempDir("", "template")
-	tpl, _ = template.New("caddy.template").Parse(`
+	tpl, _      = template.New("caddy.template").Parse(`
 		package main
 		
 		import (
@@ -41,6 +43,8 @@ var (
 )
 
 func main() {
+	flag.Parse()
+
 	if !caddyLib.isValid() {
 		log.Fatal("invalid caddy version")
 	}
@@ -67,12 +71,12 @@ func main() {
 	}
 
 	runGoCommand("get")
-	runGoCommand("build", "-o", "caddy")
+	runGoCommand("build", "-ldflags", `-extldflags "-static"`, "-o", "caddy")
 
 	// Copy caddy build on current directory
 	caddyBuild, _ := os.Open(filepath.Join(buildDir, "caddy"))
-	caddy, _ := os.Create("caddy")
-	_, err = io.Copy(caddy, caddyBuild)
+	caddyFinal := outputCaddyFile()
+	_, err = io.Copy(caddyFinal, caddyBuild)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
@@ -115,6 +119,25 @@ func runGoCommand(args ...string) {
 	if err != nil {
 		log.Fatal(err.Error())
 	}
+}
+
+func outputCaddyFile() *os.File {
+	if dir := filepath.Dir(*output); dir != "." {
+		_, err := os.Open(dir)
+
+		if os.IsNotExist(err) {
+			_ = os.MkdirAll(dir, 0755)
+		}
+	}
+
+	caddy, err := os.Create(*output)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	_ = caddy.Chmod(0777)
+
+	return caddy
 }
 
 type TemplateParameters struct {
