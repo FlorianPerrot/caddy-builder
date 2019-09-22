@@ -18,8 +18,10 @@ $ VERSION=v1.0.3 DISABLE_TELEMETRY=true PLUGINS=github.com/nicolasazrak/caddy-ca
 
 ### Second case on Dockerfile
 
+cf: [Dockerhub](https://cloud.docker.com/repository/docker/florianperrot/caddy-builder)
+
 ```Dockerfile
-FROM caddy-builder as builder
+FROM florianperrot/caddy-builder:1.0.2 as builder
 
 ENV VERSION="v1.0.3"
 ENV PLUGINS="github.com/nicolasazrak/caddy-cache,github.com/xuqingfeng/caddy-rate-limit"
@@ -39,5 +41,4 @@ RUN caddy -version
 RUN caddy -plugins
 
 CMD ["caddy"]
-
 ```
