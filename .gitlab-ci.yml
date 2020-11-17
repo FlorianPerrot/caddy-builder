@@ -10,7 +10,7 @@ stages:
 
 Test:
   stage: Test 🛠
-  image: golang:1.13
+  image: golang:1.15
   script:
     - go test
 
