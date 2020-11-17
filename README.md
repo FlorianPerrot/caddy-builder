@@ -2,7 +2,7 @@
 
 `caddy-builder` generate caddy executable with your configuration.
 
-Chose caddy version with `VERSION=v1.0.3`, chose to disable telemetry with `DISABLE_TELEMETRY=false` and chose your plugins with `PLUGINS=github.com/xuqingfeng/caddy-rate-limit@v1.6.3`.
+Chose caddy version with `VERSION=v1.0.3`, chose to disable telemetry with `DISABLE_TELEMETRY=true` and chose your plugins with `PLUGINS=github.com/xuqingfeng/caddy-rate-limit@v1.6.3`.
 
 If caddy or plugin version is omit `latest` is selected.
 
@@ -21,7 +21,7 @@ $ VERSION=v1.0.3 DISABLE_TELEMETRY=true PLUGINS=github.com/nicolasazrak/caddy-ca
 cf: [Dockerhub](https://cloud.docker.com/repository/docker/florianperrot/caddy-builder)
 
 ```Dockerfile
-FROM florianperrot/caddy-builder:1.0.2 as builder
+FROM florianperrot/caddy-builder as builder
 
 ENV VERSION="v1.0.3"
 ENV PLUGINS="github.com/nicolasazrak/caddy-cache,github.com/xuqingfeng/caddy-rate-limit"
